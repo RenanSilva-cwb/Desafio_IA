@@ -1,0 +1,323 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Academia CRUD | Login, Admin e Treinos</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <section class="login-shell" id="login-shell">
+      <div class="login-card card">
+        <span class="app-tag">PUCPR</span>
+        <h1>Entrar na academia</h1>
+        <p>Faça login como aluno ou administrador para acessar o painel.</p>
+        <form id="form-login" class="form-grid login-form">
+          <label>
+            Email
+            <input type="email" id="login-email" placeholder="aluno@academia.com" required />
+          </label>
+          <label>
+            Senha
+            <input type="password" id="login-senha" placeholder="******" required />
+          </label>
+          <div class="form-actions full-width">
+            <button class="btn btn-primary" type="submit">Entrar</button>
+          </div>
+        </form>
+        <p class="login-hint">Use <strong>admin@academia.com</strong> / <strong>admin123</strong> para entrar como administrador.</p>
+        <p class="login-error" id="login-error"></p>
+      </div>
+    </section>
+
+    <main class="app-shell hidden" id="main-app">
+      <div class="user-bar hidden" id="user-bar">
+        <span id="user-welcome"></span>
+        <button class="btn btn-secondary" id="logout-button">Sair</button>
+      </div>
+
+      <header class="app-header">
+        <div class="app-intro">
+          <span class="app-tag">PUCPR</span>
+          <h1>Academia CRUD</h1>
+          <p>Área administrativa e de aluno com controle de matrículas, treinos e planos.</p>
+        </div>
+        <div class="hero-grid">
+          <article class="stat-card">
+            <span>Total de registros</span>
+            <strong id="stat-total">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Alunos</span>
+            <strong id="stat-alunos">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Planos</span>
+            <strong id="stat-planos">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Matrículas</span>
+            <strong id="stat-matriculas">0</strong>
+          </article>
+        </div>
+      </header>
+
+      <nav class="app-tabs" role="tablist">
+        <button type="button" class="tab-button active admin-only" data-panel="alunos">Alunos</button>
+        <button type="button" class="tab-button admin-only" data-panel="planos">Planos</button>
+        <button type="button" class="tab-button" data-role="admin,aluno" data-panel="matriculas">Matrículas</button>
+        <button type="button" class="tab-button" data-role="admin,aluno" data-panel="treinos">Treinos</button>
+      </nav>
+
+      <section class="panels">
+        <section id="alunos" class="panel active" aria-labelledby="tab-alunos" data-role="admin">
+          <div class="panel-top">
+            <div>
+              <h2>Cadastro de Alunos</h2>
+              <p>Registre informações do aluno e permita o aluno acessar sua área.</p>
+            </div>
+            <button class="btn btn-primary admin-only" id="novo-aluno">Novo aluno</button>
+          </div>
+
+          <div class="card card-panel">
+            <form id="form-aluno" class="form-grid admin-only">
+              <input type="hidden" id="aluno-id" />
+              <label>
+                Nome
+                <input type="text" id="aluno-nome" placeholder="Maria Silva" required />
+              </label>
+              <label>
+                Email
+                <input type="email" id="aluno-email" placeholder="maria@exemplo.com" />
+              </label>
+              <label>
+                Senha
+                <input type="password" id="aluno-senha" placeholder="Senha do aluno" />
+              </label>
+              <label>
+                Telefone
+                <input type="tel" id="aluno-telefone" placeholder="(41) 99999-9999" />
+              </label>
+              <label>
+                Nascimento
+                <input type="date" id="aluno-nascimento" />
+              </label>
+              <div class="form-actions full-width admin-only">
+                <button class="btn btn-primary" type="submit">Salvar aluno</button>
+                <button class="btn btn-secondary" type="button" id="reset-aluno">Limpar</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="card card-table">
+            <h3>Lista de alunos</h3>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Nascimento</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="alunos-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="planos" class="panel" aria-labelledby="tab-planos" data-role="admin">
+          <div class="panel-top">
+            <div>
+              <h2>Gerenciar Planos</h2>
+              <p>Defina planos com duração, valor e descrição para oferecer aos alunos.</p>
+            </div>
+            <button class="btn btn-primary admin-only" id="novo-plano">Novo plano</button>
+          </div>
+
+          <div class="card card-panel">
+            <form id="form-plano" class="form-grid admin-only">
+              <input type="hidden" id="plano-id" />
+              <label>
+                Nome do plano
+                <input type="text" id="plano-nome" placeholder="Plano Bronze" required />
+              </label>
+              <label>
+                Duração (meses)
+                <input type="number" id="plano-duracao" placeholder="3" min="1" required />
+              </label>
+              <label>
+                Valor
+                <input type="number" id="plano-valor" placeholder="120.00" step="0.01" required />
+              </label>
+              <label>
+                Descrição
+                <input type="text" id="plano-descricao" placeholder="Acesso a equipamentos e aulas básicas" />
+              </label>
+              <div class="form-actions full-width admin-only">
+                <button class="btn btn-primary" type="submit">Salvar plano</button>
+                <button class="btn btn-secondary" type="button" id="reset-plano">Limpar</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="card card-table">
+            <h3>Lista de planos</h3>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Duração</th>
+                    <th>Valor</th>
+                    <th>Descrição</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="planos-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="matriculas" class="panel" aria-labelledby="tab-matriculas" data-role="admin,aluno">
+          <div class="panel-top">
+            <div>
+              <h2>Controlar Matrículas</h2>
+              <p>Associe alunos a planos e acompanhe o status da matrícula.</p>
+            </div>
+            <button class="btn btn-primary admin-only" id="nova-matricula">Nova matrícula</button>
+          </div>
+
+          <div class="card card-panel admin-only">
+            <form id="form-matricula" class="form-grid">
+              <input type="hidden" id="matricula-id" />
+              <label>
+                Aluno
+                <select id="matricula-aluno" required></select>
+              </label>
+              <label>
+                Plano
+                <select id="matricula-plano" required></select>
+              </label>
+              <label>
+                Início
+                <input type="date" id="matricula-inicio" required />
+              </label>
+              <label>
+                Término
+                <input type="date" id="matricula-termino" required />
+              </label>
+              <label>
+                Status
+                <select id="matricula-status" required>
+                  <option value="Ativa">Ativa</option>
+                  <option value="Concluída">Concluída</option>
+                  <option value="Cancelada">Cancelada</option>
+                </select>
+              </label>
+              <div class="form-actions full-width admin-only">
+                <button class="btn btn-primary" type="submit">Salvar matrícula</button>
+                <button class="btn btn-secondary" type="button" id="reset-matricula">Limpar</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="card card-table">
+            <h3>Lista de matrículas</h3>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Aluno</th>
+                    <th>Plano</th>
+                    <th>Início</th>
+                    <th>Término</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="matriculas-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="treinos" class="panel" aria-labelledby="tab-treinos" data-role="admin,aluno">
+          <div class="panel-top">
+            <div>
+              <h2>Gerenciar Treinos</h2>
+              <p>Crie treinos para alunos vinculados à matrícula.</p>
+            </div>
+            <button class="btn btn-primary admin-only" id="novo-treino">Novo treino</button>
+          </div>
+
+          <div class="card card-panel admin-only">
+            <form id="form-treino" class="form-grid">
+              <input type="hidden" id="treino-id" />
+              <label>
+                Matrícula
+                <select id="treino-matricula" required></select>
+              </label>
+              <label>
+                Nome do treino
+                <input type="text" id="treino-nome" placeholder="Treino de força" required />
+              </label>
+              <label>
+                Início
+                <input type="date" id="treino-inicio" required />
+              </label>
+              <label>
+                Término
+                <input type="date" id="treino-termino" required />
+              </label>
+              <label class="full-width">
+                Exercícios
+                <textarea id="treino-exercicios" rows="3" placeholder="Agachamento, supino, abdominal"></textarea>
+              </label>
+              <label class="full-width">
+                Descrição
+                <input type="text" id="treino-descricao" placeholder="Foco em resistência" />
+              </label>
+              <div class="form-actions full-width admin-only">
+                <button class="btn btn-primary" type="submit">Salvar treino</button>
+                <button class="btn btn-secondary" type="button" id="reset-treino">Limpar</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="card card-table">
+            <h3>Lista de treinos</h3>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Treino</th>
+                    <th>Aluno</th>
+                    <th>Plano</th>
+                    <th>Início</th>
+                    <th>Término</th>
+                    <th>Exercícios</th>
+                    <th>Descrição</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="treinos-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <footer class="app-footer">
+        <p>Projeto de apresentação para disciplina de Engenharia de Software.</p>
+      </footer>
+
+      <div class="notification" id="notification"></div>
+    </main>
+
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>
