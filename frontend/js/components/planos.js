@@ -64,8 +64,7 @@ async function handlePlanoSubmit(event) {
       await api.createPlano(plano);
       showNotification('Plano cadastrado com sucesso.');
     }
-    resetPlanoForm();
-    await refreshPlanos();
+    window.dispatchEvent(new CustomEvent('data-updated'));
   } catch (err) {
     showNotification(err.message);
   }
@@ -120,7 +119,7 @@ async function deletePlano(id) {
 
   try {
     await api.deletePlano(id);
-    await refreshPlanos();
+    window.dispatchEvent(new CustomEvent('data-updated'));
     showNotification('Plano excluído com sucesso.');
   } catch (err) {
     showNotification(err.message);

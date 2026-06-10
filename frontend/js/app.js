@@ -20,6 +20,13 @@ window.addEventListener('authchange', async (event) => {
   }
 });
 
+window.addEventListener('data-updated', async () => {
+  const user = getCurrentUser();
+  if (user) {
+    await refreshDashboard(user);
+  }
+});
+
 async function loadAppModules(user) {
   await initAlunos();
   await initPlanos();

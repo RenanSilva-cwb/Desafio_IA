@@ -64,8 +64,8 @@ async function handleAlunoSubmit(event) {
       await api.createAluno(aluno);
       showNotification('Aluno cadastrado com sucesso.');
     }
-    resetAlunoForm();
-    await refreshAlunos();
+
+    window.dispatchEvent(new CustomEvent('data-updated'));
   } catch (err) {
     showNotification(err.message);
   }
@@ -126,7 +126,7 @@ async function deleteAluno(id) {
 
   try {
     await api.deleteAluno(id);
-    await refreshAlunos();
+    window.dispatchEvent(new CustomEvent('data-updated'));
     showNotification('Aluno excluído com sucesso.');
   } catch (err) {
     showNotification(err.message);

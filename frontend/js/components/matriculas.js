@@ -85,8 +85,8 @@ async function handleMatriculaSubmit(event) {
       await api.createMatricula(matricula);
       showNotification('Matrícula cadastrada com sucesso.');
     }
-    resetMatriculaForm();
-    await refreshMatriculas();
+
+    window.dispatchEvent(new CustomEvent('data-updated'));
   } catch (err) {
     showNotification(err.message);
   }
@@ -143,7 +143,7 @@ async function deleteMatricula(id) {
 
   try {
     await api.deleteMatricula(id);
-    await refreshMatriculas();
+    window.dispatchEvent(new CustomEvent('data-updated'));
     showNotification('Matrícula excluída com sucesso.');
   } catch (err) {
     showNotification(err.message);

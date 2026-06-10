@@ -1,5 +1,6 @@
 import * as api from '../api.js';
 import { formatDate, showNotification, clearElement } from '../ui.js';
+import { getCurrentUser, isAdmin } from './auth.js';
 
 const form = document.getElementById('form-treino');
 const body = document.getElementById('treinos-body');
@@ -19,6 +20,7 @@ export async function initTreinos() {
 
 export async function refreshTreinos(user = null) {
   try {
+    user = user || getCurrentUser();
     await loadMatriculaOptions();
     const treinos = user?.role === 'aluno' ? await api.getTreinos(user.id) : await api.getTreinos();
     renderTreinos(treinos);
@@ -31,9 +33,21 @@ export async function refreshTreinos(user = null) {
 
 function renderTreinos(treinos) {
   clearElement(body);
+  const isUserAdmin = isAdmin(); 
+
   treinos.forEach((treino) => {
     const row = document.createElement('tr');
     row.dataset.id = treino.id;
+
+    const acoesHtml = isUserAdmin 
+      ? `
+        <div class="actions">
+          <button class="action-button action-edit" data-action="edit">Editar</button>
+          <button class="action-button action-delete" data-action="delete">Excluir</button>
+        </div>
+      `
+      : `<span style="color: var(--muted);">-</span>`; 
+
     row.innerHTML = `
       <td>${treino.nome}</td>
       <td>${treino.aluno_nome || 'Aluno removido'}</td>
@@ -42,12 +56,7 @@ function renderTreinos(treinos) {
       <td>${formatDate(treino.termino)}</td>
       <td>${treino.exercicios || '-'}</td>
       <td>${treino.descricao || '-'}</td>
-      <td>
-        <div class="actions">
-          <button class="action-button action-edit admin-only" data-action="edit">Editar</button>
-          <button class="action-button action-delete admin-only" data-action="delete">Excluir</button>
-        </div>
-      </td>
+      <td>${acoesHtml}</td>
     `;
     body.appendChild(row);
   });
@@ -69,8 +78,7 @@ async function handleTreinoSubmit(event) {
       await api.createTreino(treino);
       showNotification('Treino cadastrado com sucesso.');
     }
-    resetTreinoForm();
-    await refreshTreinos();
+    window.dispatchEvent(new CustomEvent('data-updated'));
   } catch (err) {
     showNotification(err.message);
   }
@@ -129,7 +137,7 @@ async function deleteTreino(id) {
 
   try {
     await api.deleteTreino(id);
-    await refreshTreinos();
+    window.dispatchEvent(new CustomEvent('data-updated'));
     showNotification('Treino excluído com sucesso.');
   } catch (err) {
     showNotification(err.message);
