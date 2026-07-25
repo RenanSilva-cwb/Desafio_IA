@@ -18,7 +18,8 @@ db.serialize(() => {
       email TEXT,
       telefone TEXT,
       nascimento TEXT,
-      senha TEXT NOT NULL DEFAULT ''
+      senha TEXT NOT NULL DEFAULT '',
+      altura REAL
     )
   `);
 
