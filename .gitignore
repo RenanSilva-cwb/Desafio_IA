@@ -1,0 +1,5 @@
+# Arquivos de banco de dados
+backend/academia.db
+
+# Dependências
+backend/node_modules/
