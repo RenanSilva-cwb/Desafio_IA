@@ -18,7 +18,10 @@ db.serialize(() => {
       email TEXT,
       telefone TEXT,
       nascimento TEXT,
-      senha TEXT NOT NULL DEFAULT ''
+      senha TEXT NOT NULL DEFAULT '',
+      peso REAL,
+      nivel TEXT,
+      altura REAL
     )
   `);
 
@@ -66,6 +69,18 @@ db.serialize(() => {
     const hasSenha = rows.some((column) => column.name === 'senha');
     if (!hasSenha) {
       db.run("ALTER TABLE alunos ADD COLUMN senha TEXT NOT NULL DEFAULT ''");
+    }
+    const hasPeso = rows.some((column) => column.name === 'peso');
+    if (!hasPeso) {
+      db.run('ALTER TABLE alunos ADD COLUMN peso REAL');
+    }
+    const hasNivel = rows.some((column) => column.name === 'nivel');
+    if (!hasNivel) {
+      db.run("ALTER TABLE alunos ADD COLUMN nivel TEXT");
+    }
+    const hasAltura = rows.some((column) => column.name === 'altura');
+    if (!hasAltura) {
+      db.run('ALTER TABLE alunos ADD COLUMN altura REAL');
     }
   });
 });

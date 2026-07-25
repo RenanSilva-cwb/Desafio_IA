@@ -6,6 +6,7 @@ const form = document.getElementById('form-treino');
 const body = document.getElementById('treinos-body');
 const btnNew = document.getElementById('novo-treino');
 const btnReset = document.getElementById('reset-treino');
+const btnGerarIA = document.getElementById('gerar-treino-ia'); // Novo botão
 const matriculaSelect = document.getElementById('treino-matricula');
 
 let editId = null;
@@ -14,6 +15,7 @@ export async function initTreinos() {
   btnNew?.addEventListener('click', resetTreinoForm);
   btnReset?.addEventListener('click', resetTreinoForm);
   form?.addEventListener('submit', handleTreinoSubmit);
+  btnGerarIA?.addEventListener('click', handleGerarTreinoIA); // Evento para o novo botão
   body?.addEventListener('click', handleActions);
   await refreshTreinos();
 }
@@ -42,11 +44,12 @@ function renderTreinos(treinos) {
     const acoesHtml = isUserAdmin 
       ? `
         <div class="actions">
+          <button class="action-button action-pdf" data-action="pdf">PDF</button>
           <button class="action-button action-edit" data-action="edit">Editar</button>
           <button class="action-button action-delete" data-action="delete">Excluir</button>
         </div>
       `
-      : `<span style="color: var(--muted);">-</span>`; 
+      : `<button class="action-button action-pdf" data-action="pdf">Baixar PDF</button>`; 
 
     row.innerHTML = `
       <td>${treino.nome}</td>
@@ -110,6 +113,7 @@ function handleActions(event) {
 
   if (action === 'edit') return editTreino(id);
   if (action === 'delete') return deleteTreino(id);
+  if (action === 'pdf') return window.open(`/api/treinos/${id}/pdf`, '_blank');
 }
 
 async function editTreino(id) {
@@ -143,6 +147,73 @@ async function deleteTreino(id) {
     showNotification(err.message);
   }
 }
+
+async function handleGerarTreinoIA() {
+  const matriculaId = matriculaSelect.value;
+  if (!matriculaId) {
+    return showNotification('Selecione uma matrícula primeiro para gerar um treino com IA.');
+  }
+
+  const objetivo = prompt('Qual o objetivo do treino? (Ex: Hipertrofia, Perda de Peso, Resistência)');
+  if (!objetivo) return;
+
+  const dias = prompt('Quantos dias por semana? (Ex: 3)');
+  if (!dias) return;
+
+  try {
+    // Busca os dados completos do aluno associado à matrícula
+    const matriculas = await api.getMatriculas();
+    const matricula = matriculas.find(m => m.id === Number(matriculaId));
+    if (!matricula || !matricula.aluno_id) {
+      throw new Error('Matrícula ou aluno associado não encontrado.');
+    }
+
+    // Agora os dados do aluno já vêm na matrícula
+    const alunoInfo = {
+      nome: matricula.aluno_nome,
+      peso: matricula.aluno_peso,
+      nivel: matricula.aluno_nivel,
+      nascimento: matricula.aluno_nascimento,
+      altura: matricula.aluno_altura,
+    };
+
+    await gerarTreino(objetivo, dias, alunoInfo);
+  } catch (err) {
+    showNotification(`Erro ao buscar dados para IA: ${err.message}`);
+  }
+}
+
+async function gerarTreino(objetivo, dias, aluno) {
+  try {
+    // Pega o nome do aluno selecionado na matrícula, se houver
+    const selectedOption = matriculaSelect.options[matriculaSelect.selectedIndex];
+    const nomeAluno = selectedOption ? selectedOption.text.split('—')[0].trim() : 'Aluno(a)';
+
+    btnGerarIA.disabled = true;
+    btnGerarIA.textContent = 'Gerando...';
+
+    const treinoSugerido = await api.gerarTreinoIA({ objetivo, dias, aluno });
+
+    // Formata a lista de exercícios com os links do YouTube
+    const exerciciosFormatados = treinoSugerido.exercicios.map(ex => 
+      `- ${ex.nome_exercicio} (${ex.series_reps})\n  Link: ${ex.link_youtube}`
+    ).join('\n\n');
+
+    document.getElementById('treino-nome').value = treinoSugerido.nome;
+    document.getElementById('treino-descricao').value = treinoSugerido.descricao;
+    document.getElementById('treino-exercicios').value = exerciciosFormatados;
+    document.getElementById('treino-inicio').value = treinoSugerido.inicio;
+    document.getElementById('treino-termino').value = treinoSugerido.termino;
+
+    showNotification('Sugestão de treino gerada! Revise e salve.');
+  } catch (err) {
+    showNotification(`Erro ao gerar treino: ${err.message}`);
+  } finally {
+    btnGerarIA.disabled = false;
+    btnGerarIA.textContent = 'Gerar com IA';
+  }
+}
+
 
 async function loadMatriculaOptions() {
   const matriculas = await api.getMatriculas();

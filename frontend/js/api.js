@@ -22,6 +22,10 @@ export async function getAlunos() {
   return request('/alunos');
 }
 
+export async function getAluno(id) {
+  return request(`/alunos/${id}`);
+}
+
 export async function createAluno(aluno) {
   return request('/alunos', { method: 'POST', body: JSON.stringify(aluno) });
 }
@@ -82,4 +86,8 @@ export async function updateTreino(id, treino) {
 
 export async function deleteTreino(id) {
   return request(`/treinos/${id}`, { method: 'DELETE' });
+}
+
+export async function gerarTreinoIA(data) {
+  return request('/ia/gerar-treino', { method: 'POST', body: JSON.stringify(data) });
 }

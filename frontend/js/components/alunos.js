@@ -30,6 +30,7 @@ export async function refreshAlunos() {
 function renderAlunos(alunos) {
   clearElement(body);
   alunos.forEach((aluno) => {
+    const imc = aluno.peso && aluno.altura ? (aluno.peso / (aluno.altura * aluno.altura)).toFixed(2) : '-';
     const row = document.createElement('tr');
     row.dataset.id = aluno.id;
     row.innerHTML = `
@@ -37,6 +38,7 @@ function renderAlunos(alunos) {
       <td>${aluno.email || '-'}</td>
       <td>${aluno.telefone || '-'}</td>
       <td>${formatDate(aluno.nascimento)}</td>
+      <td>${imc}</td>
       <td>
         <div class="actions">
           <button class="action-button action-edit admin-only" data-action="edit">Editar</button>
@@ -77,7 +79,10 @@ function getFormAlunoData() {
     email: document.getElementById('aluno-email').value.trim(),
     telefone: document.getElementById('aluno-telefone').value.trim(),
     nascimento: document.getElementById('aluno-nascimento').value,
-    senha: document.getElementById('aluno-senha').value.trim()
+    senha: document.getElementById('aluno-senha').value.trim(),
+    peso: Number(document.getElementById('aluno-peso').value) || null,
+    nivel: document.getElementById('aluno-nivel').value || null,
+    altura: Number(document.getElementById('aluno-altura').value) || null
   };
 }
 
@@ -104,8 +109,7 @@ function handleActions(event) {
 
 async function editAluno(id) {
   try {
-    const alunos = await api.getAlunos();
-    const aluno = alunos.find((item) => item.id === id);
+    const aluno = await api.getAluno(id);
     if (!aluno) return showNotification('Aluno não encontrado.');
 
     editId = id;
@@ -114,6 +118,9 @@ async function editAluno(id) {
     document.getElementById('aluno-email').value = aluno.email || '';
     document.getElementById('aluno-telefone').value = aluno.telefone || '';
     document.getElementById('aluno-nascimento').value = aluno.nascimento || '';
+    document.getElementById('aluno-altura').value = aluno.altura || '';
+    document.getElementById('aluno-peso').value = aluno.peso || '';
+    document.getElementById('aluno-nivel').value = aluno.nivel || '';
     document.getElementById('aluno-senha').value = '';
     showNotification('Modo edição ativado. Atualize e salve.');
   } catch (err) {

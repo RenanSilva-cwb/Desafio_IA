@@ -1,5 +1,6 @@
 const express = require('express');
 const db = require('../database');
+const PDFDocument = require('pdfkit');
 const router = express.Router();
 
 function sendDbError(res, err) {
@@ -34,6 +35,57 @@ router.get('/', (req, res) => {
   db.all(sql, params, (err, rows) => {
     if (err) return sendDbError(res, err);
     res.json(rows);
+  });
+});
+
+router.get('/:id/pdf', (req, res) => {
+  const sql = `
+    SELECT t.nome, t.descricao, t.exercicios, t.inicio, t.termino, a.nome AS aluno_nome
+    FROM treinos t
+    JOIN matriculas m ON t.matricula_id = m.id
+    JOIN alunos a ON m.aluno_id = a.id
+    WHERE t.id = ?
+  `;
+
+  db.get(sql, [req.params.id], (err, treino) => {
+    if (err) return sendDbError(res, err);
+    if (!treino) return res.status(404).json({ error: 'Treino não encontrado.' });
+
+    const doc = new PDFDocument({ margin: 50 });
+
+    const filename = `treino-${treino.aluno_nome.toLowerCase().replace(/\s/g, '-')}.pdf`;
+    res.setHeader('Content-disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-type', 'application/pdf');
+
+    doc.pipe(res);
+
+    // Cabeçalho
+    doc.fontSize(20).font('Helvetica-Bold').text('Academia Fitness', { align: 'center' });
+    doc.fontSize(12).font('Helvetica').text('Seu Treino Personalizado', { align: 'center' });
+    doc.moveDown(2);
+
+    // Informações do Aluno e Treino
+    doc.fontSize(14).font('Helvetica-Bold').text(`Aluno: ${treino.aluno_nome}`);
+    doc.fontSize(12).font('Helvetica').text(`Treino: ${treino.nome}`);
+    doc.text(`Período: ${new Date(treino.inicio).toLocaleDateString('pt-BR')} a ${new Date(treino.termino).toLocaleDateString('pt-BR')}`);
+    doc.moveDown();
+
+    // Descrição
+    if (treino.descricao) {
+      doc.font('Helvetica-Bold').text('Objetivo:');
+      doc.font('Helvetica').text(treino.descricao);
+      doc.moveDown();
+    }
+
+    // Exercícios
+    doc.font('Helvetica-Bold').text('Exercícios:');
+    doc.font('Helvetica').text(treino.exercicios);
+    doc.moveDown(3);
+
+    // Rodapé
+    doc.fontSize(10).text('Bons treinos!', { align: 'center' });
+
+    doc.end();
   });
 });
 

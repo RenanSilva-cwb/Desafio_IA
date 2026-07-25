@@ -1,5 +1,6 @@
 const express = require('express');
 const db = require('../database');
+const bcrypt = require('bcrypt');
 const router = express.Router();
 
 function sendDbError(res, err) {
@@ -8,14 +9,14 @@ function sendDbError(res, err) {
 }
 
 router.get('/', (req, res) => {
-  db.all('SELECT id, nome, email, telefone, nascimento FROM alunos ORDER BY nome', [], (err, rows) => {
+  db.all('SELECT id, nome, email, telefone, nascimento, peso, nivel, altura FROM alunos ORDER BY nome', [], (err, rows) => {
     if (err) return sendDbError(res, err);
     res.json(rows);
   });
 });
 
 router.get('/:id', (req, res) => {
-  db.get('SELECT id, nome, email, telefone, nascimento FROM alunos WHERE id = ?', [req.params.id], (err, row) => {
+  db.get('SELECT id, nome, email, telefone, nascimento, peso, nivel, altura FROM alunos WHERE id = ?', [req.params.id], (err, row) => {
     if (err) return sendDbError(res, err);
     if (!row) return res.status(404).json({ error: 'Aluno não encontrado.' });
     res.json(row);
@@ -23,31 +24,34 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-  const { nome, email, telefone, nascimento, senha } = req.body;
+  const { nome, email, telefone, nascimento, senha, peso, nivel, altura } = req.body;
   if (!nome || !senha) {
     return res.status(400).json({ error: 'Nome e senha são obrigatórios.' });
   }
 
-  const sql = 'INSERT INTO alunos (nome, email, telefone, nascimento, senha) VALUES (?, ?, ?, ?, ?)';
-  db.run(sql, [nome, email || '', telefone || '', nascimento || '', senha], function (err) {
+  bcrypt.hash(senha, 10, (err, hash) => {
     if (err) return sendDbError(res, err);
-    res.status(201).json({ id: this.lastID, nome, email, telefone, nascimento });
+    const sql = 'INSERT INTO alunos (nome, email, telefone, nascimento, senha, peso, nivel, altura) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+    db.run(sql, [nome, email || '', telefone || '', nascimento || '', hash, peso || null, nivel || null, altura || null], function (err) {
+      if (err) return sendDbError(res, err);
+      res.status(201).json({ id: this.lastID, nome, email, telefone, nascimento, peso, nivel, altura });
+    });
   });
 });
 
 router.put('/:id', (req, res) => {
-  const { nome, email, telefone, nascimento, senha } = req.body;
+  const { nome, email, telefone, nascimento, senha, peso, nivel, altura } = req.body;
   if (!nome) {
     return res.status(400).json({ error: 'O nome é obrigatório.' });
   }
 
   const sql = `
     UPDATE alunos
-    SET nome = ?, email = ?, telefone = ?, nascimento = ?, senha = CASE WHEN ? != '' THEN ? ELSE senha END
+    SET nome = ?, email = ?, telefone = ?, nascimento = ?, peso = ?, nivel = ?, altura = ?, senha = CASE WHEN ? != '' THEN ? ELSE senha END
     WHERE id = ?
   `;
 
-  db.run(sql, [nome, email || '', telefone || '', nascimento || '', senha || '', senha || '', req.params.id], function (err) {
+  db.run(sql, [nome, email || '', telefone || '', nascimento || '', peso || null, nivel || null, altura || null, senha || '', senha || '', req.params.id], function (err) {
     if (err) return sendDbError(res, err);
     if (this.changes === 0) return res.status(404).json({ error: 'Aluno não encontrado.' });
     res.json({ message: 'Aluno atualizado com sucesso.' });

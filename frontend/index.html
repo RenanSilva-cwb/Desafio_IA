@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
@@ -102,6 +102,23 @@
                 Nascimento
                 <input type="date" id="aluno-nascimento" />
               </label>
+              <label>
+                Altura (m)
+                <input type="number" id="aluno-altura" placeholder="1.75" step="0.01" />
+              </label>
+              <label>
+                Peso (kg)
+                <input type="number" id="aluno-peso" placeholder="75.5" step="0.1" />
+              </label>
+              <label>
+                Nível
+                <select id="aluno-nivel">
+                  <option value="">Não definido</option>
+                  <option value="Iniciante">Iniciante</option>
+                  <option value="Intermediário">Intermediário</option>
+                  <option value="Avançado">Avançado</option>
+                </select>
+              </label>
               <div class="form-actions full-width admin-only">
                 <button class="btn btn-primary" type="submit">Salvar aluno</button>
                 <button class="btn btn-secondary" type="button" id="reset-aluno">Limpar</button>
@@ -119,6 +136,7 @@
                     <th>Email</th>
                     <th>Telefone</th>
                     <th>Nascimento</th>
+                    <th>IMC</th>
                     <th>Ações</th>
                   </tr>
                 </thead>
@@ -282,8 +300,9 @@
                 <input type="text" id="treino-descricao" placeholder="Foco em resistência" />
               </label>
               <div class="form-actions full-width admin-only">
-                <button class="btn btn-primary" type="submit">Salvar treino</button>
-                <button class="btn btn-secondary" type="button" id="reset-treino">Limpar</button>
+                <button type="submit" class="btn btn-primary">Salvar treino</button>
+                <button type="button" id="reset-treino" class="btn btn-secondary">Limpar</button>
+                <button type="button" id="gerar-treino-ia" class="btn btn-secondary admin-only">Gerar com IA</button>
               </div>
             </form>
           </div>

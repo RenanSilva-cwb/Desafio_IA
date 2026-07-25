@@ -1,5 +1,6 @@
 const express = require('express');
 const db = require('../database');
+const bcrypt = require('bcrypt');
 const router = express.Router();
 
 function sendDbError(res, err) {
@@ -13,17 +14,27 @@ router.post('/login', (req, res) => {
     return res.status(400).json({ error: 'Email e senha são obrigatórios.' });
   }
 
-  if (email === 'admin@academia.com' && senha === 'admin123') {
-    return res.json({ role: 'admin', name: 'Administrador' });
+  // O login do admin também deve ser seguro, mas por simplicidade, vamos mantê-lo por enquanto
+  // e focar na segurança dos alunos. Em um projeto real, o admin seria um usuário no DB.
+  if (email === 'admin@academia.com') {
+    if (senha === 'admin123') {
+      return res.json({ role: 'admin', name: 'Administrador' });
+    } else {
+      return res.status(401).json({ error: 'Email ou senha incorretos.' });
+    }
   }
 
   db.get(
-    'SELECT id, nome FROM alunos WHERE email = ? AND senha = ?',
-    [email, senha],
-    (err, row) => {
+    'SELECT id, nome, senha FROM alunos WHERE email = ?',
+    [email],
+    (err, user) => {
       if (err) return sendDbError(res, err);
-      if (!row) return res.status(401).json({ error: 'Email ou senha incorretos.' });
-      res.json({ role: 'aluno', id: row.id, name: row.nome });
+      if (!user) return res.status(401).json({ error: 'Email ou senha incorretos.' });
+
+      bcrypt.compare(senha, user.senha, (err, result) => {
+        if (err || !result) return res.status(401).json({ error: 'Email ou senha incorretos.' });
+        res.json({ role: 'aluno', id: user.id, name: user.nome });
+      });
     }
   );
 });

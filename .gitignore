@@ -1,5 +1,17 @@
-# Arquivos de banco de dados
-backend/academia.db
+# Arquivo para instruir o Git sobre quais arquivos e pastas ignorar.
 
-# Dependências
-backend/node_modules/
+# Dependências do Node.js (milhares de arquivos)
+node_modules/
+
+# Arquivos de ambiente com chaves secretas
+/backend/.env
+
+# Arquivo do banco de dados
+/backend/academia.db
+
+# Arquivos de log
+npm-debug.log*
+
+# Arquivos de sistema operacional
+.DS_Store
+Thumbs.db

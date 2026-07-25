@@ -1,26 +1,30 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const alunosRoutes = require('./routes/alunos');
-const planosRoutes = require('./routes/planos');
-const matriculasRoutes = require('./routes/matriculas');
-const treinosRoutes = require('./routes/treinos');
-const authRoutes = require('./routes/auth');
+require('dotenv').config(); // Carrega as variáveis de ambiente do .env
+const apiRoutes = require('./routes'); // Importa o roteador principal da API
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use('/api/auth', authRoutes);
-app.use('/api/alunos', alunosRoutes);
-app.use('/api/planos', planosRoutes);
-app.use('/api/matriculas', matriculasRoutes);
-app.use('/api/treinos', treinosRoutes);
+
+// Servir arquivos estáticos do frontend
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
+// Centraliza todas as rotas da API sob o prefixo /api
+app.use('/api', apiRoutes);
+
+// Rota "catch-all" para servir o index.html para a SPA
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
+});
+
+// Middleware de tratamento de erros centralizado
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send({ error: 'Algo deu errado no servidor!' });
 });
 
 app.listen(PORT, () => {
