@@ -1,17 +1,5 @@
-# Arquivo para instruir o Git sobre quais arquivos e pastas ignorar.
-
-# Dependências do Node.js (milhares de arquivos)
+# Ignorar dependências do Node.js
 node_modules/
 
-# Arquivos de ambiente com chaves secretas
-/backend/.env
-
-# Arquivo do banco de dados
-/backend/academia.db
-
-# Arquivos de log
-npm-debug.log*
-
-# Arquivos de sistema operacional
-.DS_Store
-Thumbs.db
+# Ignorar arquivos de ambiente com segredos
+.env

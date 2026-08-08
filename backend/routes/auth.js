@@ -14,13 +14,15 @@ router.post('/login', (req, res) => {
     return res.status(400).json({ error: 'Email e senha são obrigatórios.' });
   }
 
-  // O login do admin também deve ser seguro, mas por simplicidade, vamos mantê-lo por enquanto
-  // e focar na segurança dos alunos. Em um projeto real, o admin seria um usuário no DB.
-  if (email === 'admin@academia.com') {
-    if (senha === 'admin123') {
+  // Em produção, as credenciais do admin DEVEM vir de variáveis de ambiente.
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@academia.com';
+  const adminSenha = process.env.ADMIN_PASSWORD || 'admin123';
+
+  if (email === adminEmail) {
+    if (senha === adminSenha) {
       return res.json({ role: 'admin', name: 'Administrador' });
     } else {
-      return res.status(401).json({ error: 'Email ou senha incorretos.' });
+      return res.status(401).json({ error: 'Credenciais de administrador inválidas.' });
     }
   }
 
