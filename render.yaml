@@ -17,7 +17,7 @@ services:
         sync: false
 
   # Serviço para o Frontend (Site Estático)
-  - type: web_site
+  - type: static
     name: frontend-academia
     region: oregon
     rootDir: frontend
@@ -29,7 +29,7 @@ services:
       - type: rewrite
         source: /api/*
         destination: https://backend-academia.onrender.com/api/*
-      # Trata o roteamento SPA (Single Page Application)
+      # Trata o roteamento do lado do cliente para a SPA
       - type: rewrite
         source: /*
         destination: /index.html
