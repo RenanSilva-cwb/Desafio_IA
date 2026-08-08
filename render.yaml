@@ -6,8 +6,8 @@ services:
     region: oregon
     rootDir: backend
     plan: free
-    buildCommand: "npm install"
-    startCommand: "node server.js"
+    buildCommand: npm install
+    startCommand: node server.js
     envVars:
       - key: GROQ_API_KEY
         sync: false
@@ -17,11 +17,9 @@ services:
         sync: false
 
   # Serviço para o Frontend (Site Estático)
-  - type: static
+  - type: static_site
     name: frontend-academia
-    region: oregon
     rootDir: frontend
-    plan: free
     buildCommand: ""
     staticPublishPath: .
     routes:
@@ -29,6 +27,7 @@ services:
       - type: rewrite
         source: /api/*
         destination: https://backend-academia.onrender.com/api/*
+
       # Trata o roteamento do lado do cliente para a SPA
       - type: rewrite
         source: /*
