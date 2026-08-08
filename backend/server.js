@@ -6,9 +6,18 @@ const apiRoutes = require('./routes'); // Importa o roteador principal da API
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Configuração de CORS mais flexível para o ambiente da Render
 const corsOptions = {
-  origin: 'https://frontend-academia-1fjh.onrender.com',
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  origin: function (origin, callback) {
+    // Permite requisições sem 'origin' (ex: Postman, server-to-server) 
+    // e de qualquer subdomínio '.onrender.com'.
+    if (!origin || (origin && new URL(origin).hostname.endsWith('.onrender.com'))) {
+      callback(null, true);
+    } else {
+      callback(new Error('Requisição não permitida pelo CORS'));
+    }
+  },
+  optionsSuccessStatus: 200 // para compatibilidade com navegadores mais antigos
 };
 
 app.use(cors(corsOptions));
