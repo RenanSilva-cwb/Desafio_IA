@@ -6,30 +6,41 @@ const apiRoutes = require('./routes'); // Importa o roteador principal da API
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuração de CORS mais flexível para o ambiente da Render
+// Configuração de CORS mais segura para o ambiente da Render
+const allowedOrigins = [ // 1. Lista de origens permitidas
+  'https://frontend-academia-1fjh.onrender.com', // Seu frontend no Render
+  'http://127.0.0.1:5500', // Servidor de desenvolvimento local (se usar Live Server)
+  'http://localhost:5500'
+];
+
 const corsOptions = {
   origin: function (origin, callback) {
-    // Permite requisições sem 'origin' (ex: Postman, server-to-server) 
-    // e de qualquer subdomínio '.onrender.com'.
-    if (!origin || (origin && new URL(origin).hostname.endsWith('.onrender.com'))) {
+    // 2. Permite requisições sem 'origin' (ex: Postman) ou da lista.
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Requisição não permitida pelo CORS'));
+      console.warn(`CORS: A origem '${origin}' foi bloqueada.`); // Log para depuração
+      callback(new Error('Origem não permitida pelo CORS'));
     }
   },
-  optionsSuccessStatus: 200 // para compatibilidade com navegadores mais antigos
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // 3. Métodos permitidos
+  allowedHeaders: ['Content-Type', 'Authorization'], // 4. Cabeçalhos permitidos
+  optionsSuccessStatus: 204
 };
 
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// Centraliza todas as rotas da API sob o prefixo /api
 app.use('/api', apiRoutes);
 
 // Middleware de tratamento de erros centralizado
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send({ error: 'Algo deu errado no servidor!' });
+  // 5. Resposta específica para erros de CORS
+  if (err.message === 'Origem não permitida pelo CORS') {
+    return res.status(403).json({ error: 'Acesso negado pela política de CORS.' });
+  }
+  res.status(500).json({ error: 'Algo deu errado no servidor!' });
 });
 
 app.listen(PORT, () => {
