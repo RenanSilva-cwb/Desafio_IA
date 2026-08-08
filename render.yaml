@@ -3,9 +3,9 @@ services:
   - type: web
     name: backend-academia
     env: node
-    region: oregon # ou a região de sua preferência
+    region: oregon
     rootDir: backend
-    plan: free # ou o plano de sua preferência
+    plan: free
     buildCommand: "npm install"
     startCommand: "node server.js"
     envVars:
@@ -17,21 +17,19 @@ services:
         sync: false
 
   # Serviço para o Frontend (Site Estático)
-  - type: static_site
+  - type: web_site
     name: frontend-academia
-    region: oregon # ou a região de sua preferência
+    region: oregon
     rootDir: frontend
-    plan: free # ou o plano de sua preferência
-    # Nenhum comando de build é necessário para este site estático simples
+    plan: free
     buildCommand: ""
-    # O diretório 'frontend' será servido como conteúdo estático
     staticPublishPath: .
     routes:
       # Redireciona chamadas /api/* para o backend
       - type: rewrite
         source: /api/*
         destination: https://backend-academia.onrender.com/api/*
-      # Trata o roteamento do lado do cliente para a SPA
+      # Trata o roteamento SPA (Single Page Application)
       - type: rewrite
         source: /*
         destination: /index.html
