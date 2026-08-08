@@ -1,5 +1,5 @@
 services:
-  # Serviço para o Backend (Node.js)
+  # Backend Node.js
   - type: web
     name: backend-academia
     env: node
@@ -16,19 +16,18 @@ services:
       - key: ADMIN_PASSWORD
         sync: false
 
-  # Serviço para o Frontend (Site Estático)
-  - type: static_site
+  # Frontend estático
+  - type: web
     name: frontend-academia
+    runtime: static
     rootDir: frontend
     buildCommand: ""
     staticPublishPath: .
     routes:
-      # Redireciona chamadas /api/* para o backend
       - type: rewrite
         source: /api/*
         destination: https://backend-academia.onrender.com/api/*
 
-      # Trata o roteamento do lado do cliente para a SPA
       - type: rewrite
         source: /*
         destination: /index.html
