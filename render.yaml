@@ -17,7 +17,7 @@ services:
         sync: false
 
   # Serviço para o Frontend (Site Estático)
-  - type: static
+  - type: static_site
     name: frontend-academia
     region: oregon # ou a região de sua preferência
     rootDir: frontend
