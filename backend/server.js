@@ -8,7 +8,8 @@ const PORT = process.env.PORT || 3000;
 
 // Configuração de CORS mais segura para o ambiente da Render
 const allowedOrigins = [ // 1. Lista de origens permitidas
-  'https://frontend-academia-1fjh.onrender.com', // Seu frontend no Render
+  'https://frontend-academia-1fjh.onrender.com', // Frontend atual no Render
+  'https://frontend-academia.onrender.com', // Nome alternativo do serviço no Render
   'http://127.0.0.1:5500', // Servidor de desenvolvimento local (se usar Live Server)
   'http://localhost:5500'
 ];
