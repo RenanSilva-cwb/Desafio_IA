@@ -1,5 +1,7 @@
 # Academia CRUD
 
+[![CI](https://github.com/RenanSilva-cwb/Desafio_IA/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/RenanSilva-cwb/Desafio_IA/actions/workflows/ci.yml)
+
 Projeto desenvolvido para a disciplina de Engenharia de Software. Consiste em uma aplicação Single Page Application (SPA) reativa com controle de acesso e quatro CRUDs interligados:
 - `Alunos`
 - `Planos`
