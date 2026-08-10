@@ -24,9 +24,6 @@ services:
     buildCommand: ""
     staticPublishPath: .
     routes:
-      - type: rewrite
-        source: /api/*
-        destination: https://backend-academia.onrender.com/api/*
 
       - type: rewrite
         source: /*

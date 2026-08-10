@@ -1,4 +1,4 @@
-const BASE_URL = '/api';
+const BASE_URL = 'https://backend-academia.onrender.com/api';
 
 async function request(path, options = {}) {
   const response = await fetch(`${BASE_URL}${path}`, {
